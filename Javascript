@@ -1,0 +1,83 @@
+const STORAGE = 'history';
+if(localStorage.getItem(STORAGE)==null)
+{
+	localStorage.setItem(STORAGE, JSON.stringify([]))
+}
+//function to add problems to history
+function addHistory(val)
+{
+	const historyElements = JSON.parse(localStorage.getItem(STORAGE));
+	if(!historyElements.includes(val))
+	{
+		historyElements.push(val)
+	}
+	localStorage.setItem(STORAGE, JSON.stringify(historyElements))
+}
+ 
+function refreshHistory()
+{
+	var historyContainer = document.getElementById("historyContainer")
+	historyContainer.innerHTML = ""
+	let historyElements = JSON.parse(localStorage.getItem(STORAGE));
+
+	var history_length = historyElements.length - 1
+	var range = 10
+	for(let i= history_length; i>=history_length - range;i--)
+	{
+		var div = document.createElement('div');
+		div.className = 'historyItem';
+		let result = '';
+		try
+		{
+			result = math.evaluate(historyElements[i])
+		}
+		catch(error)
+		{
+			result = 'INVALID RESULT'
+		}
+		div.innerHTML = `
+			<div>${historyElements[i]}</div>
+			<div>${result}</div>
+		`;
+		historyContainer.appendChild(div);
+		div.addEventListener("click",()=>{
+			document.getElementById("input").value =  historyElements[i];
+		})
+	}
+}
+
+//function to display input 
+function dis(val)
+{
+	document.getElementById("input").value+=val
+}
+//function to clear input display
+function clr()
+{
+	document.getElementById("result").value = ""
+	document.getElementById("input").value = ""
+}
+//function to delete an input
+function del()
+{
+	let input2 = document.getElementById("input")
+	input2.value = input2.value.slice(0, input2.value.length - 1)
+}
+//function to solve the problem
+function solve()
+{
+	let x = document.getElementById("input").value
+	if(!x=="")
+	{
+		let y = math.evaluate(x)
+		document.getElementById("result").value = y
+		addHistory(x)
+		refreshHistory()
+	}
+	else
+	{
+		//clear input screen
+		document.getElementById("input").value = ""
+	}
+}
+refreshHistory()
